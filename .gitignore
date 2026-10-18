@@ -1,0 +1,8 @@
+# Other notebook editions are kept locally only.
+/LangSmith_Eval_Lab_Colab_full.ipynb
+/LangSmith_Eval_Lab_Colab_solutions.ipynb
+/LangSmith_Eval_Lab_Colab_solutions_full.ipynb
+
+# Python test artifacts.
+__pycache__/
+*.pyc

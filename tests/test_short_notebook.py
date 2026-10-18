@@ -8,16 +8,12 @@ from types import SimpleNamespace
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-NAMES = ['LangSmith_Eval_Lab_Colab.ipynb', 'LangSmith_Eval_Lab_Colab_solutions.ipynb']
+NAMES = ['LangSmith_Eval_Lab_Colab.ipynb']
 
 class ShortNotebookTests(unittest.TestCase):
     def test_short_route_has_no_repeat_dependencies(self):
         for name in NAMES:
             short = json.loads((ROOT / name).read_text(encoding='utf8'))
-            full = json.loads((ROOT / name.replace('.ipynb', '_full.ipynb')).read_text(encoding='utf8'))
-            self.assertEqual(len(full['cells'])-len(short['cells']),14)
-            full_text = '\n'.join(''.join(c['source']) for c in full['cells'])
-            self.assertIn('rerun = await run_eval',full_text)
             for c in short['cells']:
                 s=''.join(c['source'])
                 self.assertNotIn('baseline rerun',s)

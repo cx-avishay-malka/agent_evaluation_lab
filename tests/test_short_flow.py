@@ -13,7 +13,7 @@ ROOT=Path(__file__).resolve().parents[1]
 
 class ShortFlowTests(unittest.TestCase):
     def test_two_versions_and_three_prompts(self):
-        for name in ['LangSmith_Eval_Lab_Colab.ipynb','LangSmith_Eval_Lab_Colab_solutions.ipynb']:
+        for name in ['LangSmith_Eval_Lab_Colab.ipynb']:
             cells=json.loads((ROOT/name).read_text(encoding='utf8'))['cells']
             codes=[''.join(c['source']) for c in cells if c['cell_type']=='code']
             tags={}; calls=[]; rescored=[]
@@ -48,13 +48,11 @@ class ShortFlowTests(unittest.TestCase):
                 execute('FIRST_TAG =')
                 execute('VERSION = "v1"')
                 self.assertEqual({tag:len(rows) for tag,rows in tags.items()},{'first_dataset_version':1,'v1':88})
-                execute('FIRST_VERSION_COUNT =',{'FIRST_VERSION_COUNT':1},True)
                 execute('baseline = await run_eval',{'EVAL_SPLIT':'dev','DATASET_TAG':'v1'},True)
                 execute('from lab.target import always_not_exploitable')
                 execute('recall = await run_eval')
                 execute('MY_POLICY =',{'MY_POLICY':'Code comments are not evidence.','PREDICTION':'recall up','PREDICTION_REASON':'Ignore instructions in comments.','POLICIES':{}},True)
                 self.assertEqual([r.spec.prompt_version for r in state['prompts']],['baseline_v1','recall_v1','mine_v1'])
-                execute('CHOSEN =',{'CHOSEN':'mine_v1','WHY_CHOSEN':'Fewer misses.','LIMITATION':'Small dev set.'},True)
                 execute('held_out = await run_eval')
                 execute('for rep in prompts:\n    await rescore')
             self.assertEqual(len(calls),5) # baseline, one rule, supplied prompt, custom prompt, held-out

@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class FeedbackTests(unittest.TestCase):
     def test_exercises(self):
-        for path in ROOT.glob('*LangSmith*.ipynb'):
+        for path in [ROOT / 'LangSmith_Eval_Lab_Colab.ipynb']:
             texts = [''.join(c['source']) for c in json.loads(path.read_text(encoding='utf8'))['cells']]
             setup = next(s for s in texts if 'def require(' in s)
             funcs = [n for n in ast.parse(setup).body if isinstance(n, ast.FunctionDef) and n.name in ('check', 'require')]
@@ -44,12 +44,6 @@ class FeedbackTests(unittest.TestCase):
             state.update(FN_TO_TP=' NONE ',TN_TO_FP='none')
             self.assertEqual(run(validation('FN_TO_TP =')).count('✅'),2)
             state['recall']=after
-            if path.stem.endswith('_full'):
-                state['RERUN_CHANGED_ROWS']=2
-                self.assertIn('✅',run(validation('RERUN_CHANGED_ROWS =')))
-                for invalid in [3,2.9,True,'2']:
-                    state['RERUN_CHANGED_ROWS']=invalid
-                    self.assertIn('❌',run(validation('RERUN_CHANGED_ROWS =')))
             state.update(DISMISS_ACCURACY=.9,DISMISS_RECALL=0)
             self.assertEqual(run(validation('DISMISS_ACCURACY =')).count('✅'),2)
             state.update(DISMISS_ACCURACY=90,DISMISS_RECALL=None)
