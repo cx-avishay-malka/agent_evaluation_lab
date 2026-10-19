@@ -91,6 +91,20 @@ class ExplorationTests(unittest.TestCase):
             self.assertFalse('NO_VERDICT_RATE' in joined, name)
             self.assertIn('<details><summary>Hint:',joined)
 
+    def test_public_notebook_keeps_only_benchmark_in_part6(self):
+        n=notebook(NAMES[0]);texts=[''.join(c['source']) for c in n['cells']]
+        start=next(i for i,s in enumerate(texts) if '## Part 6 ·' in s)
+        end=next(i for i,s in enumerate(texts) if '## Part 7 ·' in s)
+        self.assertEqual(end-start,2)
+        self.assertIn('model_benchmark_card.png',texts[start])
+        self.assertIn('which trade-off does the benchmark show?',texts[start+1])
+        decoded='\n'.join(texts)+'\n'+'\n'.join(bundle(NAMES[0]).values())
+        # Do not copy removed private identifiers into the public test itself.
+        self.assertFalse('/actions/runs/' in decoded)
+        self.assertFalse('qa-eval-' in decoded)
+        self.assertIn('DEFAULT_AI_PROXY_URL = None',bundle(NAMES[0])['src/lab/llm.py'])
+        self.assertTrue(all(not c.get('outputs') for c in n['cells'] if c['cell_type']=='code'))
+
     def test_embedded_sources_compile(self):
         a=bundle(NAMES[0])
         for name,source in a.items():

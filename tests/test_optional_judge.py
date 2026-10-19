@@ -42,7 +42,7 @@ class OptionalJudgeTests(unittest.TestCase):
                             break
                         if in_part6 and cell['cell_type'] == 'code':
                             exec(s, {})
-                self.assertEqual(len(captured), 4)
+                self.assertEqual(len(captured), 1)
                 self.assertTrue(all('question' in q for q in captured))
 
     def test_structure_and_shared_instructions(self):
